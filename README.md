@@ -13,9 +13,8 @@ In this file I briefly describe what each of the project files contain:
 * The files da.py, mlp.py, logistic_sgd.py and utils.py are taken from the section of deep         learning available on theano website (http://deeplearning.net/tutorial/)
 * sda_mod.py: this file contains the modified neural network used to extract features
     
-     In each file the parameters required in input and the output are described in details
+In each file the parameters required in input and the output are described in details
     
-    ## Ground/Non-Ground Identification
+## Ground/Non-Ground Identification
     
-    To identify ground points in the LAS files I used the software mcc-lidar, available at https://sourceforge.net/p/mcclidar/wiki/Home/
-    
+To identify ground points in the LAS files I used the software mcc-lidar, available at https://sourceforge.net/p/mcclidar/wiki/Home/
