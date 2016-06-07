@@ -13,4 +13,4 @@ In this file I briefly describe what each of the project files contain:
     
     To identify ground points in the LAS files I used the software mcc-lidar, available at https://sourceforge.net/p/mcclidar/wiki/Home/
     
-    In each file the parameters required in input and what is given in output is described in details
+    In each file the parameters required in input and the output are described in details
