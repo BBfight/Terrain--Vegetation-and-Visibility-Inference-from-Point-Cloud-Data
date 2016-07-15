@@ -27,8 +27,7 @@ Output:
 
 # THE NEURAL NETWORK MUST BE CHANGED IN ORDER TO BE TRAINED JUST ONE TIME AND NOT EVERY TIME
 # THE PART REALTIVE TO THE TREE CHARACTERISTICS MUST BE ADDED
-def extractFeaturesNeuralNetwork(out_path, input_size, hidden_sizes, number_of_features, training_epochs,
-								 areas, trees_path, trees_labels):
+def extractFeaturesNeuralNetwork(out_path, input_size, hidden_sizes, number_of_features, training_epochs, areas, trees_path, trees_labels):
 	"""Functions to extract features from the trees point structure in an automatic way 
 	   by menas of an stacked denoising autoencoder neural network
 	"""
@@ -131,8 +130,8 @@ def extractFeaturesNeuralNetwork(out_path, input_size, hidden_sizes, number_of_f
 	# converting train list to multi dimensional numpy array
 	train = np.asarray(train, dtype=np.ndarray)
 
-	# training stacked autoencoders and getting output
-	sda = test_SdA(train=train, minimum=minimum, hidden_sizes=hidden_sizes,
+	# training stacked autoencoders and saving trained network
+	sda = train_SdA(train=train, minimum=minimum, hidden_sizes=hidden_sizes,
 				  corruption_levels=corruption_levels, n_features=n_features, pretraining_epochs=training_epochs)
 	
 	# printing progress
