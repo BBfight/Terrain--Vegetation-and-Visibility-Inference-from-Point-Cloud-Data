@@ -8,11 +8,27 @@ from UsefulFunctions import compute_distance
 # setting horizon in meters
 horizon = 3600
 
+'''
+### USAGE ###
 
+Given the locations(x,y,z) of the two individuals, check if the line of sight from a to b
+crosses obstructing elements or if a is looking elsewhere, thus not seeing b.
+This routine is called by the main procedure "VisibilityNetwork.py".
+
+Input:
+	- a: list containing x,y,z of first individual
+    - b: list containing x,y,z of second individual
+    - ida: id number relative to the first baboon
+    - idb: id number relative to the second baboon
+	- timestamp: specific timestamp for which we want to compute the network
+    - obstructing_trees: list containing the trees with visual obstruction potential
+	- network: visibility network where to add eventual directed edges in case of      
+               visibility confirmation
+Output:
+	- the function returns the network with eventually added edges.
+
+'''
 def check_visibility(a, b, ida, idb, dx, dy, obstructing_trees, network):
-    """Given the locations(x,y,z) of the two individuals, check if the line of sight from a to b
-        crosses obstructing elements or if a is looking elsewhere, thus not seeing b
-    """
 
     # if distance over horizon then just return because they won't see anyway
     if compute_distance(a, b, 2) > horizon:

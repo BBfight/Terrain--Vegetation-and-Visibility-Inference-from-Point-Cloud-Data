@@ -8,10 +8,22 @@ import matplotlib.pyplot as plt
 from ComputeLineOfSight import check_visibility
 
 
+'''
+### USAGE ###
+
+Function to compute the visibility network given the path where trajectory are stored, the number of baboon, a given timestamp and the area boundaries (UP, DOWN, LEFT, RIGHT is the correct order)
+
+Input:
+	- baboons: number of baboons of which we have trajectories
+	- timestamp: specific timestamp for which we want to compute the network
+	- area_boundaries: list containing in sequence "up, down, left, right" boundaries for                    the specific area
+    - baboons_path: path to the file containing the baboons trajectories
+    - out_path: path where to store the image of the network for given timestamp
+Output:
+	- the function will store the image of the network at given timestamp in out_path
+
+'''
 def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path, out_path):
-    """Function to compute the visibility network given the path where trajectory are stored, the number
-       of baboon, a given timestamp and the area boundaries (UP, DOWN, LEFT, RIGHT is the correct order)
-    """
 
     # creating graph instance
     network = nx.DiGraph()
@@ -100,9 +112,11 @@ def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path
     plt.savefig(out_path + str(timestamp) + '.png')
     plt.clf()
 
-############################################## CALLING THE PROCEDURE #########################################################
+############################################## EXAMPLE CALL #############################
 
-# setting area boundaries
+ # calling the procedure for a spcific set of timestamps
+
+# setting area 2 boundaries
 area2_up = 0.3519
 area2_down = 0.3512
 area2_left = 36.921740485547865
