@@ -9,7 +9,7 @@ from Features import *
 
 Input:
 	- out_path: path of the folder where to store the csv containing features and characteristics
-	- trees_path: path of the folder containing the segmented trees
+	- trees_path: path of the folder containing the segmented trees, where trees are divided by areas
 	- areas: number of areas in which the point cloud surface is divided
 	- trees_labels: path of the csv containing the trees labels
 Output:
