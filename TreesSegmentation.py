@@ -1,8 +1,11 @@
 from __future__ import division
 
+
 import os
 import csv
 import laspy
+
+
 from UsefulFunctions import *
 
 
@@ -14,7 +17,7 @@ The algorithm will segment one area per time given that if the area is very big 
 In this way the function call be parallelized by calling it on different areas different times
 
 Input:
-    - area_id: string that will be appended to the folder name where identified trees are stored for id purposes
+    - area_id: number used to identify the area w.r.t. the others
 	- out_path: path of the folder where to store the csv containing features and characteristics
 	- area_file: path of the 'las' file corresponding to the area that must be segmented
 	- distance_threshold: value in meters for the adaptive distance threshold
@@ -30,7 +33,7 @@ def treesSegmentation(area_id, area_file, out_path, distance_threshold):
     print 'the distance threshold is ' + str(distance_threshold)
 
     # path where to store clusters
-    path = out_path + "/Trees Area " + area_id
+    path = out_path + "/Clusters Area " + area_id
     # if path doesn't exists, create it
     if not os.path.exists(path): 
         os.makedirs(path)
@@ -145,7 +148,7 @@ def treesSegmentation(area_id, area_file, out_path, distance_threshold):
         if len(cluster_points) >= cluster_size_threshold:
             # saving cluster as csv file
             fieldnames = ['x', 'y', 'z', 'red', 'green', 'blue', 'R', 'G', 'B']
-            with open(path + "/tree_%i.csv" % (progress+1), 'w') as cluster:
+            with open(path + "/cluster_%i.csv" % (progress+1), 'w') as cluster:
                 writer = csv.DictWriter(cluster, fieldnames=fieldnames)
                 writer.writeheader()
                 for i in range(len(cluster_points)):

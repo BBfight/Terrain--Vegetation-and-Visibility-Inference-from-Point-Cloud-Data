@@ -1,5 +1,5 @@
-from UsefulFunctions import *
 from itertools import chain
+from UsefulFunctions import *
 from sklearn.neighbors.kde import KernelDensity
 
 
@@ -20,7 +20,11 @@ def height(points):
 
 def trunk_width(points):
     """Compute width of a tree given its lowest points"""
-    min_points = points[min_height_points_indices(points)]
+    min_indices = min_height_points_indices(points)
+    min_points = points[min_indices]
+    while len(min_points) < 2:
+        points = np.delete(points, min_indices, axis=0)
+        min_points = np.vstack([min_points, points[min_height_points_indices(points)]])
     distances = list(chain.from_iterable(map(lambda x: [compute_distance(x, point, 2) for point in min_points],
                                              min_points)))
     return max(distances)

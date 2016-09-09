@@ -1,6 +1,7 @@
 from __future__ import division
 
 
+import numpy as np
 import pandas as pd
 import scipy.stats as st
 
@@ -25,24 +26,39 @@ The tested classifier are:
 	- SVM
 	- Logistic Regression
 
-For the parameter 'n_features' in the manual extracted features case a value equal to 6 means that we
-are excluding the RGB features, a value of -1 that we are considering them all 
-	
+For the parameter 'end' in the manual extracted features case a value equal to 6 means that we
+are excluding the RGB features, a value of -1 that we are considering all features and a value for
+'start' of 6 and 'end' of 9 that we are using RGB only features
+
+NB: when using the manually extracted features using SVM with LINEAR kernel will result
+    in the procedure being stucked, thus use a POLYNOMIAL kernel. When testing with the automacally
+    extracted features instead use a LINEAR kernel.
+
 '''
-# number of trees to use for the random forest
+
+start = 0 # 6 for RGB only
+end = -1 # 9 for RGB only
+
+# number of trees for the random forest
 ntree = 150
+# spatial
+spatial = 1.5
+# curvature
+curvature = 0.2
 # list where to store predictions for the statistical significance test
 predictions = []
-# getting the features and labels in csv format
-trees_features = pd.DataFrame.from_csv("THE_CSV_PATH_GOES_HERE",
-                                       % (spatial, curvature), header=0, index_col=None)
-# number of features
-n_features = -1
+# support lists
+n = 10
+accuracies = []
+recalls = []
+precisions = []
+# getting the data in csv format
+trees_features = pd.DataFrame.from_csv('INSERT_CSV_PATH_HERE' , header=0, index_col=None)
 
 # stratifying the dataset
-see = trees_features[trees_features.ix[:, -1] == 1]
+see = trees_features[trees_features.ix[:, trees_features.columns.size-1] == 1]
 see.index = range(1, len(see)+1)
-not_see = trees_features[trees_features.ix[:, -1] == 0]
+not_see = trees_features[trees_features.ix[:, trees_features.columns.size-1] == 0]
 not_see.index = range(1, len(not_see)+1)
 bottleneck = min(len(see), len(not_see))
 stratified_trees = see.append(not_see.ix[0:bottleneck]) if len(see) == bottleneck\
@@ -58,43 +74,51 @@ classifiers_dict = {0: KNeighborsClassifier(n_neighbors=3), 1: DecisionTreeClass
 for c in range(len(classifiers_dict)):
     # choosing classifier
     classifier = classifiers_dict[c]
-    # initialize list to store prediction
-    prediction = []
-    # prediction metrics
-    tp = 0
-    tn = 0
-    fp = 0
-    fn = 0
-
-    for i in range(1, len(stratified_trees)+1):
-        # creating test and train
-        test = stratified_trees.ix[i, :]
-        train = stratified_trees.drop(i)
-        # fitting the classifier
-        classifier = classifier.fit(train.ix[:, 0:n_features], train.ix[:, -1])
-        # predicting test values
-        prediction.append(classifier.predict(test[0:n_features])[0])
-        # updating prediction metrics
-        if prediction[-1] == test[-1] and test[-1] == 1:
-            tp += 1
-        elif prediction[-1] == test[-1] and test[-1] == 0:
-            tn += 1
-        elif prediction[-1] != test[-1] and test[-1] == 0:
-            fp += 1
-        else:
-            fn += 1
-    # appending predictions to the predictions list
-    predictions.append(prediction)
-
+    # performing prediction various times
+    for j in range(n):
+        # initialize list to store prediction
+        prediction = []
+        # prediction metrics
+        tp = 0
+        tn = 0
+        fp = 0
+        fn = 0
+        # iterating over the rows
+        for i in range(1, len(stratified_trees)+1):
+            # creating test and train
+            test = stratified_trees.ix[i, :]
+            train = stratified_trees.drop(i)
+            features = train.columns.size - 2
+            label = train.columns.size - 1
+            # fitting the classifier
+            classifier = classifier.fit(train.ix[:, start:end], train.ix[:, label])
+            # predicting test values
+            prediction.append(classifier.predict(test[start:end])[0])
+            # updating prediction metrics
+            if prediction[-1] == test[label] and test[label] == 1:
+                tp += 1
+            elif prediction[-1] == test[label] and test[label] == 0:
+                tn += 1
+            elif prediction[-1] != test[label] and test[label] == 0:
+                fp += 1
+            else:
+                fn += 1
+        # computing metrics
+        accuracies.append((tp+tn)/(tp+tn+fp+fn))
+        recalls.append(tp/(tp+tn))
+        precisions.append(tp/(tp+fp))
     # printing final progress
     print 'LOOCV using ' + str(classifier).split('(')[0] + ' completed, the resulting metrics are:'
-    # printing metrics
-    accuracy = (tp+tn)/(tp+tn+fp+fn)
-    recall = tp/(tp+tn)
-    precision = (tp/(tp+fp))
-    print 'accuracy is ' + str(accuracy) + ', recall is ' + str(recall) + ', precision is ' + str(precision)
-
-# Computing statistical significance
+    print 'accuracy is ' + str(np.mean(accuracies)) +  ' +- ' + str(np.std(accuracies))
+    print 'recall is ' + str(np.mean(recalls)) + ' +- ' + str(np.std(recalls))
+    print 'precision is ' + str(np.mean(precisions)) + ' +- ' + str(np.std(precisions))
+    # appending predictions to the predictions list
+    predictions.append(prediction)
+    # reset lists
+    accuracies = []
+    recalls = []
+    precisions = []
+# Computing statistical significance using the last prediction obtained with each classifier
 significance = st.f_oneway(stratified_trees.ix[:, stratified_trees.columns.size-1],
                            predictions[0], predictions[1], predictions[2],
                            predictions[3], predictions[4], predictions[5])

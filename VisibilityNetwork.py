@@ -1,3 +1,4 @@
+import os
 import utm
 import numpy as np
 import pandas as pd
@@ -16,14 +17,22 @@ Function to compute the visibility network given the path where trajectory are s
 Input:
 	- baboons: number of baboons of which we have trajectories
 	- timestamp: specific timestamp for which we want to compute the network
-	- area_boundaries: list containing in sequence "up, down, left, right" boundaries for                    the specific area
+	- area_boundaries: list containing in sequence "up, down, left, right" boundaries for the specific area
     - baboons_path: path to the file containing the baboons trajectories
+    - trees_characteristics: path of the csv file containing trees characteristics and labels
     - out_path: path where to store the image of the network for given timestamp
 Output:
 	- the function will store the image of the network at given timestamp in out_path
 
 '''
-def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path, out_path):
+def computeVisibilityNetwork(baboons, timestamp, area_boundaries, baboons_path, trees_characteristics, out_path):
+
+    # check if folder to save images    
+    if not os.path.exists(out_path + "/Visibility Network Timestamps"): 
+        os.makedirs(out_path + "/Visibility Network Timestamps")
+        
+    # update out path
+    out_path = out_path + "/Visibility Network Timestamps"
 
     # creating graph instance
     network = nx.DiGraph()
@@ -33,9 +42,7 @@ def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path
     area_min = utm.from_latlon(area_boundaries[2], area_boundaries[3])[0:2]
 
     # open file with the trees features and label
-    trees_characteristics = pd.DataFrame.from_csv(
-        'C:/Users/Ben/Google Drive/UIC/Thesis/Data/trees_characteristics_area2.csv',
-        header=0, index_col=None)
+    trees_characteristics = pd.DataFrame.from_csv(trees_characteristics, header=0, index_col=None)
     # keeping only trees with visual obstruction potential
     obstructing_trees = trees_characteristics[trees_characteristics['see/notSee'] == 0]
 
@@ -43,7 +50,7 @@ def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path
     for i in range(1, baboons+1):
         print 'parsing trajectory of baboon ' + str(i) + ' for timestamp ' + str(timestamp)
         # opening trajectory csv
-        trajectory_1 = np.genfromtxt(baboons_path + "trajectory_%i.csv" % i, delimiter=",", skip_header=True)
+        trajectory_1 = np.genfromtxt(baboons_path + "/trajectory_%i.csv" % i, delimiter=",", skip_header=True)
         # keeping only points in area range
         trajectory_1 = trajectory_1[np.where(np.logical_and(np.logical_and(trajectory_1.transpose()[0] >= area_min[0],
                                                                            trajectory_1.transpose()[0] <= area_max[0]),
@@ -77,7 +84,7 @@ def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path
             if j == i:
                 continue
             # opening trajectory csv
-            trajectory_2 = np.genfromtxt(baboons_path + "trajectory_%i.csv" % j, delimiter=",", skip_header=True)
+            trajectory_2 = np.genfromtxt(baboons_path + "/trajectory_%i.csv" % j, delimiter=",", skip_header=True)
             # keeping only points in area range
             trajectory_2 = trajectory_2[np.where(np.logical_and(np.logical_and(trajectory_2.transpose()[0] >= area_min[0],
                                                                                trajectory_2.transpose()[0] <= area_max[0]),
@@ -111,21 +118,3 @@ def compute_visibility_network(baboons, timestamp, area_boundaries, baboons_path
     nx.draw(network, arrows=True, with_labels=True, node_size=2500, width=2)
     plt.savefig(out_path + str(timestamp) + '.png')
     plt.clf()
-
-############################################## EXAMPLE CALL #############################
-
- # calling the procedure for a spcific set of timestamps
-
-# setting area 2 boundaries
-area2_up = 0.3519
-area2_down = 0.3512
-area2_left = 36.921740485547865
-area2_right = 36.9221
-# setting path where trajectory files are stored
-baboons_path = "C:/Users/Ben/Google Drive/UIC/Thesis/Data/Baboons Visibility Network/Baboons Trajectories/"
-# setting out path
-out_path = "C:/Users/Ben/Google Drive/UIC/Thesis/Data/Baboons Visibility Network/Visibility Networks Images/"
-
-# calling procedure for set of timestamps
-for timestamp in range(178496, 178596):
-    compute_visibility_network(26, timestamp, [area2_up, area2_right, area2_down, area2_left], baboons_path, out_path)

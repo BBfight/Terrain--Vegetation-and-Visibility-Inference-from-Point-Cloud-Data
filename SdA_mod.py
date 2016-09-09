@@ -401,16 +401,16 @@ def train_SdA(train, minimum, n_features, hidden_sizes,
            ' ran for %.2fm' % ((end_time - start_time) / 60.)), file=sys.stderr)
     # end-snippet-4
 
-	# returning the trained network
-	return sda
+    # returning the trained network
+    return sda
 	
+"""Use the trained network to predict"""
 def test_SdA(network, test):
-	"""Use the trained network to predict"""
+
     # storing the test in a theano shared variable
-	test = theano.shared(numpy.asarray(test, dtype=theano.config.floatX))
-	predict_model = theano.function(
+    test = theano.shared(numpy.asarray(test, dtype=theano.config.floatX))
+    predict_model = theano.function(
         inputs=[network.x],
-        outputs=[network.sigmoid_layers[-1].output]
-    )
-	# returning the extracted features
+        outputs=[network.sigmoid_layers[-1].output])
+    # returning the extracted features
     return predict_model(test.get_value())
