@@ -31,9 +31,6 @@ def computeVisibilityNetwork(baboons, timestamp, area_boundaries, baboons_path, 
     if not os.path.exists(out_path + "/Visibility Network Timestamps"): 
         os.makedirs(out_path + "/Visibility Network Timestamps")
         
-    # update out path
-    out_path = out_path + "/Visibility Network Timestamps"
-
     # creating graph instance
     network = nx.DiGraph()
 
@@ -116,5 +113,5 @@ def computeVisibilityNetwork(baboons, timestamp, area_boundaries, baboons_path, 
 
     # drawing the visibility network computed
     nx.draw(network, arrows=True, with_labels=True, node_size=2500, width=2)
-    plt.savefig(out_path + str(timestamp) + '.png')
+    plt.savefig(out_path + "/Visibility Network Timestamps/" + str(timestamp) + '.png')
     plt.clf()
